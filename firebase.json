@@ -1,0 +1,28 @@
+{
+  "firestore": {
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "careconnect-687c3",
+          "appId": "1:55712418397:android:f278c7b473cdd496bb1bb4",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "careconnect-687c3",
+          "configurations": {
+            "android": "1:55712418397:android:f278c7b473cdd496bb1bb4",
+            "ios": "1:55712418397:ios:05d81d6adbe754a1bb1bb4",
+            "macos": "1:55712418397:ios:05d81d6adbe754a1bb1bb4",
+            "web": "1:55712418397:web:b7c155cecdcef863bb1bb4",
+            "windows": "1:55712418397:web:78ab7c8a9c72b330bb1bb4"
+          }
+        }
+      }
+    }
+  }
+}

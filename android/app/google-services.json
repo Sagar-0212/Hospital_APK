@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "55712418397",
+    "project_id": "careconnect-687c3",
+    "storage_bucket": "careconnect-687c3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55712418397:android:f278c7b473cdd496bb1bb4",
+        "android_client_info": {
+          "package_name": "com.careconnect.careconnect_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdaEliFsQpK5cG2fRMlxq7fTKmHLmUyY0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55712418397:android:502fd4ae6a5b46a5bb1bb4",
+        "android_client_info": {
+          "package_name": "com.careconnect.flutter_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdaEliFsQpK5cG2fRMlxq7fTKmHLmUyY0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
