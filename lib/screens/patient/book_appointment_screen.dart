@@ -44,6 +44,8 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
       patientName: user.name,
       doctorId: _selectedDoctor!.id,
       doctorName: _selectedDoctor!.name,
+      doctorSpecialization: _selectedDoctor!.specialization,
+      doctorDegree: _selectedDoctor!.degree,
       date: _selectedDate,
       timeSlot: _selectedTimeSlot!,
       status: 'pending',
@@ -163,7 +165,9 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
             _searchQuery.toLowerCase(),
           );
           final mSpec =
-              _selectedSpecialty == 'All' || doc.role == _selectedSpecialty;
+              _selectedSpecialty == 'All' ||
+              (doc.specialization?.toLowerCase() ==
+                  _selectedSpecialty.toLowerCase());
           return mS && mSpec;
         }).toList();
         if (filtered.isEmpty) {
@@ -451,9 +455,10 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                     ),
                   ),
                   Text(
-                    doc.role.toUpperCase(),
+                    '${doc.specialization ?? "General Specialist"}${doc.degree != null ? " | ${doc.degree}" : ""}',
                     style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
                   ),

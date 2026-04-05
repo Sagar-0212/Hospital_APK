@@ -5,6 +5,8 @@ class AppUser {
   final String name;
   final String email;
   final String role; // "patient", "doctor", or "admin"
+  final String? specialization; // For doctors: Cardiology, Pediatrics, etc.
+  final String? degree; // For doctors: MBBS, MD, etc.
   final DateTime createdAt;
   final Map<String, List<String>>? clinicalHours; // For doctors: {"Monday": ["09:00 AM", ...], "Tuesday": [...]}
   final bool isApproved; // For doctors: false by default, true once approved by admin
@@ -15,6 +17,8 @@ class AppUser {
     required this.name,
     required this.email,
     required this.role,
+    this.specialization,
+    this.degree,
     required this.createdAt,
     this.clinicalHours,
     this.isApproved = true, // Patients/admins are approved by default
@@ -45,6 +49,8 @@ class AppUser {
       name: data['name'] ?? '',
       email: data['email'] ?? '',
       role: data['role'] ?? 'patient',
+      specialization: data['specialization'],
+      degree: data['degree'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       clinicalHours: hours,
       isApproved: data['isApproved'] ?? (data['role'] != 'doctor'),
@@ -57,6 +63,8 @@ class AppUser {
       'name': name,
       'email': email,
       'role': role,
+      'specialization': specialization,
+      'degree': degree,
       'createdAt': Timestamp.fromDate(createdAt),
       'clinicalHours': clinicalHours,
       'isApproved': isApproved,

@@ -405,7 +405,7 @@ class _PatientDashboardScreenState
                             ),
                           ),
                           Text(
-                            '${DateFormat('MMM d').format(app.date)} · ${app.timeSlot}',
+                            '${app.doctorSpecialization ?? "Specialist"}${app.doctorDegree != null ? " | ${app.doctorDegree}" : ""} · ${DateFormat('MMM d').format(app.date)} · ${app.timeSlot}',
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: AppColors.textSecondary,

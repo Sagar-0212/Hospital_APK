@@ -153,9 +153,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ),
         Text(
-          isDoctor ? 'Senior Specialist' : 'Patient',
+          isDoctor
+              ? (user.specialization ?? 'Senior Specialist')
+              : 'Patient',
           style: GoogleFonts.inter(fontSize: 14, color: AppColors.primary),
         ),
+        if (isDoctor && user.degree != null)
+          Text(
+            user.degree!,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
       ],
     );
   }

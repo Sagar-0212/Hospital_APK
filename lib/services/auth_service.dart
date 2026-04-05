@@ -82,8 +82,10 @@ class AuthService {
     String email,
     String password,
     String name,
-    String role,
-  ) async {
+    String role, {
+    String? specialization,
+    String? degree,
+  }) async {
     try {
       UserCredential userCred = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -150,6 +152,8 @@ class AuthService {
           name: name,
           email: email,
           role: role,
+          specialization: specialization,
+          degree: degree,
           createdAt: DateTime.now(),
           clinicalHours: initialHours,
           isApproved:

@@ -6,6 +6,8 @@ class Appointment {
   final String doctorId;
   final String patientName;
   final String doctorName;
+  final String? doctorSpecialization;
+  final String? doctorDegree;
   final DateTime date;
   final String timeSlot;
   final String status; // 'pending', 'upcoming', 'completed', 'cancelled', 'rescheduled'
@@ -18,6 +20,8 @@ class Appointment {
     required this.doctorId,
     required this.patientName,
     required this.doctorName,
+    this.doctorSpecialization,
+    this.doctorDegree,
     required this.date,
     required this.timeSlot,
     required this.status,
@@ -32,6 +36,8 @@ class Appointment {
       doctorId: data['doctorId'] ?? '',
       patientName: data['patientName'] ?? 'Unknown',
       doctorName: data['doctorName'] ?? 'Unknown',
+      doctorSpecialization: data['doctorSpecialization'],
+      doctorDegree: data['doctorDegree'],
       date: (data['date'] as Timestamp).toDate(),
       timeSlot: data['timeSlot'] ?? '',
       status: data['status'] ?? 'pending',
@@ -46,6 +52,8 @@ class Appointment {
       'doctorId': doctorId,
       'patientName': patientName,
       'doctorName': doctorName,
+      'doctorSpecialization': doctorSpecialization,
+      'doctorDegree': doctorDegree,
       'date': Timestamp.fromDate(date),
       'timeSlot': timeSlot,
       'status': status,

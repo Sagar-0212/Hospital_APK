@@ -60,7 +60,7 @@ class DoctorDashboardScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildTopBar(),
-                    _buildHero(greeting, user.name, upcomingApps.length),
+                    _buildHero(greeting, user, upcomingApps.length),
 
                     if (pendingApps.isNotEmpty) ...[
                       const SizedBox(height: 24),
@@ -146,7 +146,7 @@ class DoctorDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHero(String greeting, String name, int count) {
+  Widget _buildHero(String greeting, AppUser user, int count) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
@@ -161,13 +161,24 @@ class DoctorDashboardScreen extends ConsumerWidget {
             ),
           ),
           Text(
-            name,
+            user.name + (user.degree != null ? ' (${user.degree})' : ''),
             style: GoogleFonts.inter(
               fontSize: 26,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryDark,
             ),
           ),
+          const SizedBox(height: 4),
+          if (user.specialization != null)
+            Text(
+              user.specialization!.toUpperCase(),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primary,
+                letterSpacing: 1,
+              ),
+            ),
           const SizedBox(height: 6),
           Text(
             'You have $count upcoming appointments. Stay on top of your schedule.',

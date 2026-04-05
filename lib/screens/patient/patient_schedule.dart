@@ -162,6 +162,15 @@ class _PatientScheduleScreenState extends ConsumerState<PatientScheduleScreen> {
             const SizedBox(width: 12),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(app.doctorName, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
+              if (app.doctorSpecialization != null)
+                Text(
+                  '${app.doctorSpecialization}${app.doctorDegree != null ? " (${app.doctorDegree})" : ""}',
+                  style: GoogleFonts.inter(
+                    color: AppColors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               Text(app.type, style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 13)),
             ]),
           ]),

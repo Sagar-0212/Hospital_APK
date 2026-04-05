@@ -22,6 +22,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   final _regNameCtrl = TextEditingController();
   final _regEmailCtrl = TextEditingController();
   final _regPassCtrl = TextEditingController();
+  final _regSpecCtrl = TextEditingController();
+  final _regDegreeCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -78,6 +80,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             _regPassCtrl.text.trim(),
             _regNameCtrl.text.trim(),
             role,
+            specialization: isPatient ? null : _regSpecCtrl.text.trim(),
+            degree: isPatient ? null : _regDegreeCtrl.text.trim(),
           );
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
@@ -331,6 +335,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           Icons.lock_outline_rounded,
           true,
         ),
+        if (!isPatient) ...[
+          const SizedBox(height: 16),
+          _buildInputField(
+            _regSpecCtrl,
+            'Specialization (e.g. Cardiology)',
+            Icons.workspace_premium_outlined,
+            false,
+          ),
+          const SizedBox(height: 16),
+          _buildInputField(
+            _regDegreeCtrl,
+            'Degree (e.g. MBBS, MD)',
+            Icons.school_outlined,
+            false,
+          ),
+        ],
         const SizedBox(height: 24),
         _buildActionButton(
           'Create ${isPatient ? "Patient" : "Doctor"} Profile',
