@@ -7,6 +7,8 @@ import '../models/app_user.dart';
 import '../models/medical_record.dart';
 import '../models/prescription.dart';
 import '../models/clinical_note.dart';
+import '../models/chat_message.dart';
+import '../services/chat_service.dart';
 
 // Export auth providers
 export '../services/auth_service.dart'
@@ -19,6 +21,8 @@ final firestoreServiceProvider = Provider<FirestoreService>(
 final adminActionsServiceProvider = Provider<AdminActionsService>(
   (ref) => AdminActionsService(),
 );
+
+final chatServiceProvider = Provider<ChatService>((ref) => ChatService());
 
 // Patient Providers
 final patientAppointmentsProvider = StreamProvider<List<Appointment>>((ref) {
@@ -95,4 +99,14 @@ final allDoctorsProvider = StreamProvider<List<AppUser>>((ref) {
 
 final allUsersProvider = StreamProvider<List<AppUser>>((ref) {
   return ref.read(firestoreServiceProvider).getAllUsers();
+});
+
+// Chat Providers
+final chatMessagesProvider = StreamProvider.family<List<ChatMessage>, String>((
+  ref,
+  receiverId,
+) {
+  final user = ref.watch(currentUserProvider).value;
+  if (user == null) return Stream.value([]);
+  return ref.read(chatServiceProvider).getMessages(user.id, receiverId);
 });

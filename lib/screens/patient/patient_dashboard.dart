@@ -414,6 +414,16 @@ class _PatientDashboardScreenState
                         ],
                       ),
                     ),
+                    IconButton(
+                      onPressed: () => context.push(
+                        '/chat/${app.doctorId}/${Uri.encodeComponent(app.doctorName)}',
+                      ),
+                      icon: const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                    ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,

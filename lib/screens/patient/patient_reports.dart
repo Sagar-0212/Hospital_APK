@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../core/theme/colors.dart';
 import '../../providers/app_providers.dart';
 import '../../models/prescription.dart';
@@ -21,7 +22,7 @@ class _PatientReportsScreenState extends ConsumerState<PatientReportsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -55,7 +56,8 @@ class _PatientReportsScreenState extends ConsumerState<PatientReportsScreen>
               controller: _tabController,
               children: [
                 _buildPrescriptionsTab(prescriptionsAsync),
-                _buildRecordsTab(),
+                _buildRecordsTab(ref),
+                _buildNotesTab(ref),
               ],
             ),
           ),
@@ -86,6 +88,7 @@ class _PatientReportsScreenState extends ConsumerState<PatientReportsScreen>
         tabs: const [
           Tab(text: 'Prescriptions'),
           Tab(text: 'Lab Records'),
+          Tab(text: 'Clinical Notes'),
         ],
       ),
     );
@@ -232,76 +235,170 @@ class _PatientReportsScreenState extends ConsumerState<PatientReportsScreen>
     );
   }
 
-  Widget _buildRecordsTab() {
-    // Placeholder for Lab Records
-    final fakeRecords = [
-      {
-        'title': 'Complete Blood Count',
-        'date': 'Mar 24, 2024',
-        'provider': 'City Health Lab',
-        'status': 'Final',
-      },
-      {
-        'title': 'ECG - Cardiology',
-        'date': 'Feb 12, 2024',
-        'provider': 'General Hospital',
-        'status': 'Archived',
-      },
-    ];
+  Widget _buildRecordsTab(WidgetRef ref) {
+    final user = ref.watch(currentUserProvider).value;
+    if (user == null) return const Center(child: CircularProgressIndicator());
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(24),
-      itemCount: fakeRecords.length,
-      itemBuilder: (context, index) {
-        final r = fakeRecords[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.cardGray.withValues(alpha: 0.5)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF3E5F5),
-                  borderRadius: BorderRadius.circular(16),
+    final recordsAsync = ref.watch(patientRecordsProvider(user.id));
+
+    return recordsAsync.when(
+      data: (records) {
+        if (records.isEmpty) {
+          return _buildEmptyState(
+            'No lab records found',
+            Icons.science_outlined,
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(24),
+          itemCount: records.length,
+          itemBuilder: (context, index) {
+            final r = records[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.cardGray.withValues(alpha: 0.5),
                 ),
-                child: const Icon(Icons.science_outlined, color: Colors.purple),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      r['title']!,
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3E5F5),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    Text(
-                      '${r['date']} • ${r['provider']}',
-                      style: GoogleFonts.inter(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
+                    child: const Icon(
+                      Icons.science_outlined,
+                      color: Colors.purple,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          r.title,
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${DateFormat('MMM dd, yyyy').format(r.createdAt)} • ${r.uploaderRole.toUpperCase()}',
+                          style: GoogleFonts.inter(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.file_download_outlined,
+                    color: AppColors.primary,
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+  }
+
+  Widget _buildNotesTab(WidgetRef ref) {
+    final user = ref.watch(currentUserProvider).value;
+    if (user == null) return const Center(child: CircularProgressIndicator());
+
+    final notesAsync = ref.watch(patientNotesProvider(user.id));
+
+    return notesAsync.when(
+      data: (notes) {
+        if (notes.isEmpty) {
+          return _buildEmptyState(
+            'No clinical notes found',
+            Icons.description_outlined,
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(24),
+          itemCount: notes.length,
+          itemBuilder: (context, index) {
+            final n = notes[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.cardGray.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.sticky_note_2_outlined,
+                        color: AppColors.primary,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        DateFormat('MMM dd, yyyy').format(n.date),
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    n.observation,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  if (n.diagnosis.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Diagnosis: ${n.diagnosis}',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryDark,
+                        ),
                       ),
                     ),
                   ],
-                ),
+                ],
               ),
-              const Icon(
-                Icons.file_download_outlined,
-                color: AppColors.primary,
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
     );
   }
 

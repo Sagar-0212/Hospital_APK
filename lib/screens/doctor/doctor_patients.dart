@@ -454,7 +454,9 @@ class _DoctorPatientsScreenState extends ConsumerState<DoctorPatientsScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.push(
+                    '/chat/${p['id']}/${Uri.encodeComponent(p['name'] as String)}',
+                  ),
                   icon: const Icon(Icons.chat_outlined, size: 16),
                   label: const Text('Message'),
                   style: ElevatedButton.styleFrom(

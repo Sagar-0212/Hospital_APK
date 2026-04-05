@@ -15,6 +15,7 @@ import '../../screens/doctor/doctor_patients.dart';
 import '../../screens/doctor/clinical_notes_screen.dart';
 import '../../screens/doctor/add_prescription_screen.dart';
 import '../../screens/profile/profile_screen.dart';
+import '../../screens/chat/chat_screen.dart';
 import '../../screens/admin/admin_shell.dart';
 import '../../screens/admin/admin_dashboard.dart';
 import '../../screens/admin/admin_manage_doctors.dart';
@@ -133,6 +134,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const Placeholder(), // To be created
           ),
         ],
+      ),
+      // Global Chat Route
+      GoRoute(
+        path: '/chat/:receiverId/:receiverName',
+        builder: (context, state) {
+          final receiverId = state.pathParameters['receiverId']!;
+          final receiverName = Uri.decodeComponent(
+            state.pathParameters['receiverName']!,
+          );
+          return ChatScreen(
+            receiverId: receiverId,
+            receiverName: receiverName,
+          );
+        },
       ),
     ],
   );
