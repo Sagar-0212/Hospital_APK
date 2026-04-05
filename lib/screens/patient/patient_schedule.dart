@@ -217,7 +217,11 @@ class _PatientScheduleScreenState extends ConsumerState<PatientScheduleScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              if (app.status == 'cancelled') context.go('/patient/schedule/book');
+              if (app.status == 'cancelled') {
+                context.go('/patient/schedule/book');
+              } else if (app.status != 'pending') {
+                _showAppointmentDetails(context, app);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: app.status == 'pending' ? AppColors.cardGray : AppColors.primaryDark,
@@ -228,6 +232,160 @@ class _PatientScheduleScreenState extends ConsumerState<PatientScheduleScreen> {
           ),
         ),
       ]),
+    );
+  }
+
+  void _showAppointmentDetails(BuildContext context, Appointment app) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Appointment Details',
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    app.doctorName[0],
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        app.doctorName,
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        app.doctorSpecialization ?? 'Specialist',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            _detailRow(Icons.calendar_today_outlined, 'Date', DateFormat('MMMM dd, yyyy').format(app.date)),
+            const SizedBox(height: 12),
+            _detailRow(Icons.access_time_outlined, 'Time', app.timeSlot),
+            const SizedBox(height: 12),
+            _detailRow(Icons.medical_services_outlined, 'Visit Type', app.type),
+            const SizedBox(height: 12),
+            _detailRow(Icons.info_outline, 'Status', app.status.toUpperCase()),
+            if (app.cancellationReason != null) ...[
+              const SizedBox(height: 12),
+              _detailRow(Icons.warning_amber_outlined, 'Reason', app.cancellationReason!, color: AppColors.error),
+            ],
+            const SizedBox(height: 32),
+            if (app.status == 'upcoming' || app.status == 'rescheduled')
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () async {
+                    try {
+                      await ref.read(firestoreServiceProvider).updateAppointmentStatus(app.id, 'cancelled', reason: 'Cancelled by patient');
+                      if (context.mounted) Navigator.pop(context);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                      }
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text('Cancel Appointment', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            if (app.status == 'rescheduled') ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await ref.read(firestoreServiceProvider).updateAppointmentStatus(app.id, 'upcoming');
+                      if (context.mounted) Navigator.pop(context);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.success,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text('Accept New Time', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailRow(IconData icon, String label, String value, {Color? color}) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: color ?? AppColors.textHint),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppColors.textHint, fontWeight: FontWeight.w500)),
+            Text(value, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: color ?? AppColors.textPrimary)),
+          ],
+        ),
+      ],
     );
   }
 

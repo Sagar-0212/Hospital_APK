@@ -49,6 +49,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 24),
 
                   if (isDoctor) ...[
+                    _buildDoctorProfessionalDetails(context, ref, user),
+                    const SizedBox(height: 24),
                     _buildDailyClinicalHoursSection(context, ref, user),
                     const SizedBox(height: 24),
                   ],
@@ -552,6 +554,215 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               isRed: true,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDoctorProfessionalDetails(
+    BuildContext context,
+    WidgetRef ref,
+    AppUser doctor,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Professional Details',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _showEditDoctorProfileDialog(context, ref, doctor),
+                  icon: const Icon(Icons.edit, color: AppColors.primary, size: 20),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (doctor.bio != null && doctor.bio!.isNotEmpty) ...[
+              Text(
+                'About',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textHint,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                doctor.bio!,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const Divider(height: 24),
+            ],
+            Row(
+              children: [
+                _profStat('Exp', '${doctor.experienceYears ?? 0} Yrs'),
+                _profStat('Degree', doctor.degree ?? 'N/A'),
+                _profStat('Spec', doctor.specialization ?? 'N/A'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _profStat(String label, String value) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(fontSize: 11, color: AppColors.textHint),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryDark,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditDoctorProfileDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppUser doctor,
+  ) {
+    final nameC = TextEditingController(text: doctor.name);
+    final specC = TextEditingController(text: doctor.specialization);
+    final degreeC = TextEditingController(text: doctor.degree);
+    final bioC = TextEditingController(text: doctor.bio);
+    final expC = TextEditingController(text: doctor.experienceYears?.toString());
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          left: 24,
+          right: 24,
+          top: 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Edit Professional Profile',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _editField('Full Name', nameC, Icons.person_outline),
+              _editField('Specialization', specC, Icons.medical_services_outlined),
+              _editField('Degree (e.g. MBBS, MD)', degreeC, Icons.school_outlined),
+              _editField('Years of Experience', expC, Icons.work_outline, isNumeric: true),
+              _editField('About / Bio', bioC, Icons.info_outline, maxLines: 4),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await ref.read(firestoreServiceProvider).updateDoctorProfile(
+                        uid: doctor.id,
+                        name: nameC.text.trim(),
+                        specialization: specC.text.trim(),
+                        degree: degreeC.text.trim(),
+                        bio: bioC.text.trim(),
+                        experienceYears: int.tryParse(expC.text.trim()) ?? 0,
+                      );
+                      if (context.mounted) Navigator.pop(context);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: $e')),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryDark,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text('Save Changes', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _editField(
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    int maxLines = 1,
+    bool isNumeric = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, size: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.cardGray),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.cardGray),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          ),
         ),
       ),
     );

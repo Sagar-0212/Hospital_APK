@@ -76,11 +76,6 @@ class _DoctorPatientsScreenState extends ConsumerState<DoctorPatientsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primaryDark,
-        onPressed: () => context.go('/doctor/patients'),
-        child: const Icon(Icons.person_add, color: Colors.white),
-      ),
       body: SafeArea(
         top: false,
         child: Column(

@@ -116,8 +116,6 @@ class _PatientDashboardScreenState
                     _buildTopBar(user),
                     _buildHero(greeting, user.name, upcomingApps.length),
                     const SizedBox(height: 24),
-                    _buildVitalsCard(),
-                    const SizedBox(height: 24),
                     _buildUploadSection(),
                     const SizedBox(height: 24),
                     _buildUpcomingSection(
@@ -209,16 +207,16 @@ class _PatientDashboardScreenState
           Text(
             greeting,
             style: GoogleFonts.inter(
-              fontSize: 26,
-              fontWeight: FontWeight.w400,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
               color: AppColors.textPrimary,
             ),
           ),
           Text(
             name,
             style: GoogleFonts.inter(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
               color: AppColors.primaryDark,
             ),
           ),
@@ -244,47 +242,6 @@ class _PatientDashboardScreenState
     );
   }
 
-  Widget _buildVitalsCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0x0F000000),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Vital Statistics',
-              style: GoogleFonts.inter(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _vitalRow(
-              Icons.favorite,
-              Colors.red,
-              'HEART RATE',
-              '72 bpm',
-              'Normal',
-            ),
-            const Divider(height: 24),
-            _vitalRow(Icons.air, Colors.teal, 'OXYGEN', '98 %', 'Optimal'),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildUploadSection() {
     return Padding(
@@ -364,7 +321,7 @@ class _PatientDashboardScreenState
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             'Upcoming Visits',
-            style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w800),
           ),
         ),
         const SizedBox(height: 12),
@@ -401,14 +358,16 @@ class _PatientDashboardScreenState
                           Text(
                             app.doctorName,
                             style: GoogleFonts.inter(
-                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                           Text(
                             '${app.doctorSpecialization ?? "Specialist"}${app.doctorDegree != null ? " | ${app.doctorDegree}" : ""} · ${DateFormat('MMM d').format(app.date)} · ${app.timeSlot}',
                             style: GoogleFonts.inter(
-                              fontSize: 12,
+                              fontSize: 14,
                               color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -461,7 +420,7 @@ class _PatientDashboardScreenState
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             'Your Records',
-            style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w800),
           ),
         ),
         const SizedBox(height: 12),
@@ -535,8 +494,8 @@ class _PatientDashboardScreenState
                           r.title,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -585,65 +544,6 @@ class _PatientDashboardScreenState
     );
   }
 
-  Widget _vitalRow(
-    IconData icon,
-    Color iconColor,
-    String label,
-    String value,
-    String status,
-  ) {
-    return Row(
-      children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: iconColor, size: 18),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textHint,
-                ),
-              ),
-              Text(
-                value,
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            status,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: AppColors.success,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _quickAction(String label, IconData icon) {
     return Container(

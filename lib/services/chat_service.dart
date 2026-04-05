@@ -7,40 +7,39 @@ final chatServiceProvider = Provider<ChatService>((ref) => ChatService());
 class ChatService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  String _getChatId(String u1, String u2) {
+    final ids = [u1, u2]..sort();
+    return ids.join('_');
+  }
+
   Stream<List<ChatMessage>> getMessages(String user1, String user2) {
-    // We use a specific collection for each chat pair or a global one with filters
-    // For simplicity and efficiency, we'll use a global 'chats' collection
+    final chatId = _getChatId(user1, user2);
     return _db
         .collection('messages')
-        .where(
-          Filter.or(
-            Filter.and(
-              Filter('senderId', isEqualTo: user1),
-              Filter('receiverId', isEqualTo: user2),
-            ),
-            Filter.and(
-              Filter('senderId', isEqualTo: user2),
-              Filter('receiverId', isEqualTo: user1),
-            ),
-          ),
-        )
-        .orderBy('timestamp', descending: true)
+        .where('chatId', isEqualTo: chatId)
         .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs
-                  .map((doc) => ChatMessage.fromMap(doc.data(), doc.id))
-                  .toList(),
-        );
+        .map((snapshot) {
+      final messages = snapshot.docs
+          .map((doc) => ChatMessage.fromMap(doc.data(), doc.id))
+          .toList();
+      
+      // Sort client-side to bypass Firestore composite index requirement
+      messages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      return messages;
+    });
   }
 
   Future<void> sendMessage(String senderId, String receiverId, String text) async {
-    if (text.trim().isEmpty) return;
+    final trimmedText = text.trim();
+    if (trimmedText.isEmpty) return;
+    
+    final chatId = _getChatId(senderId, receiverId);
     
     await _db.collection('messages').add({
+      'chatId': chatId,
       'senderId': senderId,
       'receiverId': receiverId,
-      'text': text,
+      'text': trimmedText,
       'timestamp': FieldValue.serverTimestamp(),
     });
   }

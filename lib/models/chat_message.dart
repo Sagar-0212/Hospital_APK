@@ -21,7 +21,7 @@ class ChatMessage {
       senderId: data['senderId'] ?? '',
       receiverId: data['receiverId'] ?? '',
       text: data['text'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp).toDate(),
+      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 

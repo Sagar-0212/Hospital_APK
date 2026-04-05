@@ -39,6 +39,23 @@ class FirestoreService {
     await _db.collection('users').doc(uid).update({'clinicalHours': hours});
   }
 
+  Future<void> updateDoctorProfile({
+    required String uid,
+    required String name,
+    required String specialization,
+    required String degree,
+    required String bio,
+    required int experienceYears,
+  }) async {
+    await _db.collection('users').doc(uid).update({
+      'name': name,
+      'specialization': specialization,
+      'degree': degree,
+      'bio': bio,
+      'experienceYears': experienceYears,
+    });
+  }
+
   // APPOINTMENT Methods
   Future<void> createAppointment(Appointment app) async {
     await _db.collection('appointments').doc(app.id).set(app.toMap());

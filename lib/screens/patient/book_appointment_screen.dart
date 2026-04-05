@@ -83,74 +83,163 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          'New Booking',
+          _selectedDoctor == null ? 'New Booking' : 'Doctor Profile',
           style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, size: 20),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (_selectedDoctor != null) {
+              setState(() {
+                _selectedDoctor = null;
+                _selectedTimeSlot = null;
+              });
+            } else {
+              context.pop();
+            }
+          },
         ),
       ),
-      body: Column(
-        children: [
-          if (_selectedDoctor == null) _buildSearchAndFilters(),
-          if (_selectedDoctor != null) _buildSelectedDoctorHeader(),
-          Expanded(
-            child: _selectedDoctor == null
-                ? _buildDoctorList(doctorsAsync)
-                : _buildDateTimeSelection(),
-          ),
-        ],
-      ),
+      body: _selectedDoctor == null
+          ? Column(
+              children: [
+                _buildSearchAndFilters(),
+                Expanded(child: _buildDoctorList(doctorsAsync)),
+              ],
+            )
+          : _buildDoctorProfileBookingView(),
       bottomNavigationBar: _buildBottomAction(),
     );
   }
 
-  Widget _buildSelectedDoctorHeader() {
+  Widget _buildDoctorProfileBookingView() {
+    final doctor = _selectedDoctor!;
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDoctorHeader(doctor),
+          const SizedBox(height: 24),
+          _buildAboutSection(doctor),
+          const SizedBox(height: 24),
+          _buildDateTimeSelection(),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDoctorHeader(AppUser doctor) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      color: Colors.white,
-      child: Row(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+      ),
+      child: Column(
         children: [
           CircleAvatar(
-            backgroundColor: AppColors.primaryLight,
+            radius: 50,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             child: Text(
-              _selectedDoctor!.name[0],
-              style: const TextStyle(
+              doctor.name[0].toUpperCase(),
+              style: GoogleFonts.inter(
+                fontSize: 36,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryDark,
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _selectedDoctor!.name,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  'Available for consultation',
-                  style: GoogleFonts.inter(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 16),
+          Text(
+            doctor.name,
+            style: GoogleFonts.inter(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
-          TextButton(
-            onPressed: () => setState(() {
-              _selectedDoctor = null;
-              _selectedTimeSlot = null;
-            }),
-            child: const Text('Change'),
+          Text(
+            '${doctor.specialization ?? "Specialist"} | ${doctor.degree ?? "MD"}',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _headerStat('Exp', '${doctor.experienceYears ?? 0} Yrs'),
+              _statDivider(),
+              _headerStat('Patients', '1.2k+'),
+              _statDivider(),
+              _headerStat('Rating', '4.9'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _headerStat(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryDark,
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: AppColors.textHint,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _statDivider() {
+    return Container(
+      height: 24,
+      width: 1,
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      color: AppColors.cardGray,
+    );
+  }
+
+  Widget _buildAboutSection(AppUser doctor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'About Doctor',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            doctor.bio ??
+                'Dr. ${doctor.name} is a highly dedicated ${doctor.specialization ?? "specialist"} focused on providing the best healthcare services. With extensive experience in ${doctor.specialization ?? "medical care"}, they ensure every patient receives personalized attention and optimal treatment.',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
           ),
         ],
       ),

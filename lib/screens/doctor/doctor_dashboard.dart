@@ -48,9 +48,6 @@ class DoctorDashboardScreen extends ConsumerWidget {
                 .toList();
 
             final nextApp = upcomingApps.isNotEmpty ? upcomingApps.first : null;
-            final minsToNext = nextApp?.date
-                .difference(DateTime.now())
-                .inMinutes;
 
             return RefreshIndicator(
               onRefresh: () async => ref.invalidate(doctorAppointmentsProvider),
@@ -67,15 +64,7 @@ class DoctorDashboardScreen extends ConsumerWidget {
                       _buildPendingRequests(context, ref, pendingApps, user),
                     ],
 
-                    if (nextApp != null &&
-                        minsToNext != null &&
-                        minsToNext > 0) ...[
-                      const SizedBox(height: 20),
-                      _buildNextArrivalCard(minsToNext),
-                    ],
 
-                    const SizedBox(height: 24),
-                    _buildUrgentAlerts(),
 
                     const SizedBox(height: 24),
                     _buildUpcomingSection(context, appointmentsAsync),
@@ -155,16 +144,16 @@ class DoctorDashboardScreen extends ConsumerWidget {
           Text(
             '$greeting Dr.',
             style: GoogleFonts.inter(
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
               color: AppColors.textPrimary,
             ),
           ),
           Text(
             user.name + (user.degree != null ? ' (${user.degree})' : ''),
             style: GoogleFonts.inter(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
               color: AppColors.primaryDark,
             ),
           ),
@@ -209,8 +198,8 @@ class DoctorDashboardScreen extends ConsumerWidget {
               Text(
                 'Pending Requests',
                 style: GoogleFonts.inter(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               Container(
@@ -365,110 +354,6 @@ class DoctorDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNextArrivalCard(int mins) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x14000000),
-              blurRadius: 8,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primaryDark,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(Icons.timer_outlined, color: Colors.white),
-            ),
-            const SizedBox(width: 14),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'NEXT ARRIVAL IN',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textHint,
-                    letterSpacing: 1,
-                  ),
-                ),
-                Text(
-                  '${mins > 60 ? '${(mins / 60).floor()}h ${mins % 60}' : mins} min',
-                  style: GoogleFonts.inter(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUrgentAlerts() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Urgent Alerts',
-                style: GoogleFonts.inter(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.error,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '3 NEW',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _alertCard(
-            icon: Icons.science_outlined,
-            iconColor: AppColors.error,
-            borderColor: AppColors.error,
-            title: 'Critical Lab Result',
-            subtitle: 'Patient: Marcus Thorne (ID-882)',
-            detail: 'Potassium levels outside safety range [6.2 mEq/L]',
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildUpcomingSection(
     BuildContext context,
@@ -484,8 +369,8 @@ class DoctorDashboardScreen extends ConsumerWidget {
               Text(
                 'Upcoming Appointments',
                 style: GoogleFonts.inter(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               TextButton(
@@ -617,7 +502,7 @@ class DoctorDashboardScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             'Patient Summaries',
-            style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w800),
           ),
         ),
         const SizedBox(height: 12),
@@ -689,21 +574,21 @@ class DoctorDashboardScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Total Active',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.white60,
+                        Text(
+                          'Total Active',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: Colors.white60,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '$totalCount',
-                        style: GoogleFonts.inter(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        Text(
+                          '$totalCount',
+                          style: GoogleFonts.inter(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -714,21 +599,21 @@ class DoctorDashboardScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Today',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: Colors.white60,
+                          Text(
+                            'Today',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.white60,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${today.length}',
-                          style: GoogleFonts.inter(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                          Text(
+                            '${today.length}',
+                            style: GoogleFonts.inter(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -757,75 +642,6 @@ class DoctorDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _alertCard({
-    required IconData icon,
-    required Color iconColor,
-    required Color borderColor,
-    required String title,
-    required String subtitle,
-    required String detail,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(left: BorderSide(color: borderColor, width: 4)),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x0F000000),
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: iconColor, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  detail,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: iconColor,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _patientSummaryCard(
     BuildContext context,
